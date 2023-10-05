@@ -1,13 +1,17 @@
-// contracts/FlashLoan.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.10;
 
-import {FlashLoanSimpleReceiverBase} from "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
-import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
-import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
+import { FlashLoanSimpleReceiverBase } from "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
+import { IPoolAddressesProvider } from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
+import { IERC20 } from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
 contract FlashLoan is FlashLoanSimpleReceiverBase {
     address payable owner;
+
+    // arbitrage tokens and amount
+    address arbToken1;
+    address arbToken2;
+    uint256 arbAmount;
 
     constructor(address _addressProvider)
         FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider))
@@ -42,10 +46,16 @@ contract FlashLoan is FlashLoanSimpleReceiverBase {
         return true;
     }
 
-    function requestFlashLoan(address _token, uint256 _amount) public {
+    function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _arbToken1, address _arbToken2, uint256 _arbAmount) public {
+
+        // set the arbitrage tokens and amounts
+        arbToken1 = _arbToken1;
+        arbToken2 = _arbToken2;
+        arbAmount = _arbAmount;
+
         address receiverAddress = address(this);
-        address asset = _token;
-        uint256 amount = _amount;
+        address asset = _borrowingToken;
+        uint256 amount = _borrowingAmount;
         bytes memory params = "";
         uint16 referralCode = 0;
 
