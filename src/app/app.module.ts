@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
+
 import { Index } from './components/index/app.index';
 import { tradeService } from './services/trade.service';
 
@@ -10,8 +11,9 @@ import { tradeService } from './services/trade.service';
     Index
   ],
   imports: [
+    AppRoutingModule,
     BrowserModule,
-    AppRoutingModule
+    HttpClientModule
   ],
   providers: [
     tradeService

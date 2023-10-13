@@ -1,41 +1,36 @@
 import { Injectable } from "@angular/core";
-import { Observable, catchError, mergeMap, of, tap } from "rxjs";
-import { ethers } from "ethers";
+import { Observable, catchError } from "rxjs";
 import { environment } from "../../environments/environment";
-import FlashLoan from "../../../artifacts/contracts/FlashLoan.sol/FlashLoan.json";
+import { IBalance, ITrade, ITradeReport } from "../interfaces";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable()
 export class tradeService {
 
-	contractAddress: string;
+    httpOptions = {
+        headers: new HttpHeaders({
+            "Content-Type": "application/json",
+        }),
+    };
 	
-	constructor() {
-		this.contractAddress = environment.blockchain.network.FlashLoan;
-	}
+	constructor(private http: HttpClient) {}
 	
-	getBalance(tokenAddress: string): Observable<any> {
-		let contract;
-        return of(this.getContract()).pipe(
-            tap(c => (contract = c)),
-            mergeMap((contract: any) => {
-                return contract.getBalance(tokenAddress);
-            }),
+	getBalance(): Observable<IBalance> {
+        const url = `${environment.serverEndpoint}/balance`;
+        return this.http.get<IBalance>(url).pipe(
             catchError(error => {
-                throw this.embellishError(`balanceOf('${this.contractAddress}')`, error);
+                throw this.embellishError(`getBalance`, error);
             })
         );
 	}
 
-	getContract(): ethers.Contract {
-        let provider;
-        if(environment.blockchain.network.name === "hardhat") {
-            provider = ethers.getDefaultProvider("http://localhost:8545/");
-        // } else {
-        //     provider = new ethers.providers.Web3Provider(ethereum);
-        }
-        // const signer = new ethers.Wallet(<string>process.env.PrivateKey, provider);
-        let contract = new ethers.Contract(this.contractAddress, FlashLoan.abi, provider);
-        return contract;
+    trade(trade: ITrade): Observable<ITradeReport> {
+        const url = `${environment.serverEndpoint}/trade`;
+        return this.http.post<any>(url, { trade }, this.httpOptions).pipe(
+            catchError(error => {
+                throw this.embellishError(`trade`, error);
+            })
+        );
     }
 
     embellishError(message: string, error: Error): Error {

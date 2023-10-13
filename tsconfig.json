@@ -28,7 +28,7 @@
   },
   "exclude": [
     "node_modules",
-    "hardhat.config.ts",
+    "server/hardhat.config.ts",
     "**/*.spec.ts"
   ],
   "angularCompilerOptions": {

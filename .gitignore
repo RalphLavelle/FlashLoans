@@ -11,4 +11,5 @@ artifacts
 
 .env
 .env.local
+.env.staging
 .env.prod

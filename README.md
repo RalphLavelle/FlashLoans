@@ -1,33 +1,58 @@
-# FlashLoans
+Tradie (FlashLoan trading app)
+==============================
 
-## Start the blockchain
+## Server-side
+1. Start the blockchain
+> cd server
 > npm run hhup  
 > npm run hhdep
+2. Start the Node app
+> node tradie
 
-## Start the app
+Mske sure to copy the MockERC20 and FlashLoan addresses to the .env config file(s).
+
+## Client-side
+1. Start the Angular app
 > npm run start
 
-Check balance, mint ERC20, etc.
-> npx hardhat mintERC20 --network localhost
+Check balance, mint DAI, etc.
+> npx hardhat mintDAI --network localhost
+
+Request a flash loan!
+> npx hardhat requestFlashLoan --network localhost
+
+## Local env
+Locally, I use a fake ERC20 coin to stand in for $DAI (no $USDC yet). Also, in the local version, the call in FlashLoan to POOL is commented out. 
+
+## Deployment strategy
+For phase 1, there will be no need to deploy the front end to a prod environment. Maybe there never will be. I'm the only one using it, and I don't need it online. The things that needs to change are:
+
+* the environment tag ('local', 'staging', 'prod')
+* blockchain address
+* address of the lending pool
+* address(es) of the borrowing coin(s), i.e. $DAI, $USDC
+* addresses of the app's contract(s)
+* the private key
+
+Also, I will restrict things initially to two exchanges: Uniswap and SushiSwap. Everything will boil down to the arbitrage opp. between the prices of a particular coin on those two dexes. 
+
+## Loan providers
+1. Aave
+Docs: https://docs.aave.com/developers/guides/flash-loans, 
+https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
 
 ## Mumbai
 Deploy using Remix.
-FlashLoan address: 0xFbbE12578d0c269368C36157203DA43534Bd328C
-
-Mumbai ERC20 addresses 
-$DAI: 0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded
-$USDC: 0x52D800ca262522580CeBAD275395ca6e7598C014
+Latest FlashLoan address: 0x9D2946eADfa4e5c0CbdaDB044f8704e123142a6B
 
 https://mumbai.polygonscan.com/
 
-Aave pool Address Provider, on Mumbai: 0x4CeDCB57Af02293231BAA9D39354D6BFDFD251e0
+## Remix imports for Mumbai:
+UniswapSingleSwap:
+import { ISwapRouter} from https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISwapRouter.sol
 
-## Remix imports:
+FlashLoan:
 import {FlashLoanReceiverBase} from "https://github.com/aave/protocol-v2/blob/master/contracts/flashloan/base/FlashLoanReceiverBase.sol";
 import {ILendingPool} from "https://github.com/aave/protocol-v2/blob/master/contracts/interfaces/ILendingPool.sol";
 import {ILendingPoolAddressesProvider} from "https://github.com/aave/protocol-v2/blob/master/contracts/interfaces/ILendingPoolAddressesProvider.sol";
 import {IERC20} from "https://github.com/aave/protocol-v2/blob/master/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
-
-## Documentation:
-https://docs.aave.com/developers/guides/flash-loans
-https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
