@@ -31,25 +31,33 @@ const Blockchain = {
     },
 
     getDaiContract() {
-        const provider = this.getProvider();
-        const signer = this.getSigner(provider);
-        // console.log(`Connecting to ERC20 contract at ${process.env.ERC20} with signer ${signer.address}\n`);
         const abi = [
             "function balanceOf(address account) public view returns (uint256)",
             "function mint(address to, uint256 amount)"
         ];
-        return new ethers.Contract(process.env.DAI, abi, signer);
+        return new ethers.Contract(process.env.DAI, abi);
     },
 
     getFlashLoanContract() {
-        const provider = this.getProvider();
-        const signer = this.getSigner(provider);
-        // console.log(`Connecting to the FlashLoan contract at ${process.env.FLASHLOAN}\n`);
         const abi = [
             "event LoanRequested(address borrowingToken, uint256 borrowingAmount, address swapToken, uint24 poolFee)",
             "function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _swapToken, uint24 _poolFee) public"
         ];
-        let contract = new ethers.Contract(process.env.FLASHLOAN, abi, signer);
+        return new ethers.Contract(process.env.FLASHLOAN, abi);
+    },
+
+    getUniswapSingleSwapContract() {
+        const abi = [
+            "event TokenSwapped(address borrowingToken, uint256 borrowingAmount, address swapToken, uint24 poolFee)"
+        ];
+        return new ethers.Contract(process.env.UNISWAP_SINGLESWAP, abi)
+    },
+
+    getContract(options) {
+        const provider = this.getProvider();
+        const signer = this.getSigner(provider);
+        // console.log(`Connecting to the FlashLoan contract at ${process.env.FLASHLOAN}\n`);
+        let contract = new ethers.Contract(options.address, options.abi, signer);
         return contract;
     }
 };

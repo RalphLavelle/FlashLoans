@@ -41,11 +41,19 @@ Also, I will restrict things initially to two exchanges: Uniswap and SushiSwap. 
 Docs: https://docs.aave.com/developers/guides/flash-loans, 
 https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
 
+Be careful that there are some tokens that may seem to be DAI or LINK, etc., but are in fact an Aave-wrapped version.
+
+## Dexes
+1. Uniswap
+Since the Uniswap router has the same address for all chains, testnets and main, I'm hardcoding the address into the UniswapSingleSwap contract. SO, one less thing to worry about for testnet/mainnet config.
+
 ## Mumbai
 Deploy using Remix.
 Latest FlashLoan address: 0x9D2946eADfa4e5c0CbdaDB044f8704e123142a6B
 
 https://mumbai.polygonscan.com/
+
+JUst stick with one pair of tokens for testing on Mumbai, since it's not guaranteed that a pair that exists on mainnet exists as a pool on testnet. I just need one pair to work, some combination of USDC, DAI, and WETH, probably. 
 
 ## Remix imports for Mumbai:
 UniswapSingleSwap:

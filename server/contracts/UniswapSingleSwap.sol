@@ -10,14 +10,16 @@ contract UniswapSingleSwap {
     address public constant routerAddress = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
     ISwapRouter public immutable swapRouter = ISwapRouter(routerAddress);
 
+    event TokenSwapped(address borrowingToken, uint256 borrowingAmount, address swapToken, uint24 poolFee);
+
     // This contract swaps Token1 (e.g. DAI) for Token2 (some other ERC20)
-    address public Token1; //  = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-    IERC20 public Token2; //  = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    IERC20 public Token1;
+    IERC20 public Token2;
     uint24 poolFee;
 
     // this is the method called from FlashLoan 
     function swap(address _borrowingToken, uint256 _borrowingAmount, address _swapToken, uint24 _poolFee) external {
-        Token1 = _borrowingToken;
+        Token1 = IERC20(_borrowingToken);
         Token2 = IERC20(_swapToken);
         poolFee = _poolFee;
 
@@ -45,5 +47,7 @@ contract UniswapSingleSwap {
 
         // // The call to `exactInputSingle` executes the swap.
         // amountOut = swapRouter.exactInputSingle(params);
+
+        emit TokenSwapped(address(Token1), amountIn, address(Token2), poolFee);
     }
 }

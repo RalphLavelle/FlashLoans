@@ -27,6 +27,11 @@ contract FlashLoan is FlashLoanSimpleReceiverBase {
         uniswap = new UniswapSingleSwap();
     }
 
+    // this is only to test the Uniswap part 
+    function testingUniswap(address _borrowingToken, uint256 _borrowingAmount, address _swapToken, uint24 _poolFee) external {
+        uniswap.swap(_borrowingToken, _borrowingAmount, _swapToken, _poolFee);
+    }
+
     /**
         This function is called after your contract has received the flash loaned amount
      */
