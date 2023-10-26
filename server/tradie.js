@@ -13,11 +13,14 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/balance', async (req, res) => {
-    const erc20 = await Blockchain.getDaiContract();
+    const coin = req.query.coin;
+    const coinAddress = Blockchain.getAddress({ symbol: coin });
+    const flashLoan = await Blockchain.getFlashLoanContract();
     let balance = 0;
+    
     try {
-        balance = await erc20.balanceOf(process.env.FLASHLOAN);
-        balance = ethers.BigNumber.from(balance) / 10 ** 18;
+        balance = await flashLoan.contract.getBalance(coinAddress);
+        balance = ethers.BigNumber.from(balance) / 10 ** 6; // n.b. 6 decimals
     } catch(e) {
         console.log(`Error getting balance: ${JSON.stringify(e)}`);
     }
@@ -28,50 +31,53 @@ app.get('/balance', async (req, res) => {
 
 app.post('/trade', async (req, res) => {
     const flashLoan = await Blockchain.getFlashLoanContract();
-    const trade = req.body.trade;
+    const tradeOptions = req.body.tradeOptions;
 
-    // Hardcoded, for the time being
-    const lender = "Aave";
-    const dex = "Uniswap";
+    let response = {
+        env: {
+            contractAddress: process.env.FLASHLOAN,
+            name: process.env.ENVIRONMENT
+        },
+        events: {},
+        tradeOptions
+    };
 
-    let message = `${trade.borrowing.amount} of token ${trade.borrowing.token} requested from ${lender}, which will be used to trade ${trade.swapToken} on ${dex}`;
-    console.log(message);
     try {
-        let error = "";
+        response.error = "";
 
         // borrowing
-        const borrowingTokenAddress = Blockchain.getAddress({
-            symbol: trade.borrowing.token,
-            lender
+        const borrowTokenAddress = Blockchain.getAddress({
+            symbol: tradeOptions.borrow.token
         });
-        if(!borrowingTokenAddress) error += `Invalid borrowing token: ${trade.trade.borrowing.token} `;
+        if(!borrowTokenAddress) response.error += `Invalid borrow token: ${tradeOptions.borrow.token} `;
         
         // swapping
-        const swapTokenAddress = Blockchain.getAddress({
-            symbol: trade.swapToken,
-            dex
+        const buyTokenAddress = Blockchain.getAddress({
+            symbol: tradeOptions.buy.token
         });
-        if(!swapTokenAddress) error += `Invalid swap token: ${trade.swapToken}`;
+        if(!buyTokenAddress) response.error += `Invalid buy token: ${tradeOptions.buy.token}`;
 
-        if(error) {
-            message = error;
-        } else {
-            const txResponse = await flashLoan.requestFlashLoan(
-                borrowingTokenAddress,
-                trade.borrowing.amount,
-                swapTokenAddress,
-                trade.poolFee
+        if(!response.error) {
+            const txResponse = await flashLoan.contract.requestFlashLoan(
+                borrowTokenAddress,
+                tradeOptions.borrow.amount,
+                buyTokenAddress,
+                tradeOptions.buy.poolFee
             );
             const txReceipt = await txResponse.wait();
-            const [ loanRequested ] = txReceipt.events;
-            const { borrowingToken, borrowingAmount, swapToken } = loanRequested.args;
+            const filters = flashLoan.contract.filters;
+           
+            response.events.LoanRequested = Blockchain.getEventArgs(filters.LoanRequested, flashLoan, txReceipt);
+            response.events.LoanReceived = Blockchain.getEventArgs(filters.LoanReceived, flashLoan, txReceipt);
+            response.events.TokensBought = Blockchain.getEventArgs(filters.TokensBought, flashLoan, txReceipt);
+            response.events.TokensSold = Blockchain.getEventArgs(filters.TokensSold, flashLoan, txReceipt);
         }
-        res.send({ message });
     } catch(ex) {
-        res.send({
-            message: `${message}, but there was an error: ${ex.message}.`
-        });
+        const error = Blockchain.prettifyError(ex.message);
+        response.error += error;
     }
+    // console.log(`>>> response: ${JSON.stringify(response)}`);
+    res.send(response);
 });
 
 const port = 3000;

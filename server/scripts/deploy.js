@@ -20,12 +20,6 @@ async function main() {
     console.log(`Using the PoolAddressesProvider contract at ${poolAddressesProviderAddress}.`);
   }
 
-  // Next, deploy UniswapSinglewap
-  const uniswap = await hre.ethers.getContractFactory("UniswapSingleSwap");
-  const Uniswap = await uniswap.deploy();
-  await Uniswap.deployed();
-  reportDeployed("UniswapSingleSwap", Uniswap);
-
   // Next, deploy the DAI
   const dai = await ethers.getContractFactory("DAI");
   const DAI = await dai.deploy();

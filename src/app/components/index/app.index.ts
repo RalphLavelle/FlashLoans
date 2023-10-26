@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { tradeService } from '../../services/trade.service';
+import { saveService } from '../../services/save.service';
 import { catchError, of } from 'rxjs';
-import { IBalance, IBorrowing, ITrade, ITradeReport } from "./../../interfaces";
+import { IBalance, ITradeOptions, ITradeResponse } from "./../../interfaces";
+
 
 @Component({
   selector: 'trading-bot',
@@ -10,13 +12,20 @@ import { IBalance, IBorrowing, ITrade, ITradeReport } from "./../../interfaces";
 })
 export class Index {
 
-  tradeOptions: ITrade = {
-    borrowing: {
-      token: 'DAI',
-      amount: 1000
+  tradeOptions: ITradeOptions = {
+    borrow: {
+      amount: 100,
+      provider: "Aave",
+      token: 'USDT'
     },
-    poolFee: 3000,
-    swapToken: 'ROGANF'
+    buy: {
+      poolFee: 3000,
+      provider: "Uniswap",
+      token: 'GHST'
+    },
+    sell: {
+      provider: "Sushiswap"
+    }
   };
   
   balance: {
@@ -25,19 +34,29 @@ export class Index {
     report: string
   };
   trade: {
-    loading?: boolean,
-    report?: string
+    loading?: boolean
   };
+  trades: Array<ITradeResponse>
 
-  constructor(private tradeSvc: tradeService) {}
+  constructor(private tradeSvc: tradeService, private saveSvc: saveService) {}
 
   ngOnInit() {
+    this.trade = {};
+    this.getTrades();
+    this.getStableCoinBalance();
+  }
+
+  getTrades() {
+    this.trades = this.saveSvc.getTrades();
+  }
+
+  getStableCoinBalance() {
     this.balance = {
       loading: true,
       report: "Loading..."
     };
-    this.trade = {};
-    this.tradeSvc.getBalance().pipe(
+    
+    this.tradeSvc.getBalance(this.tradeOptions.borrow.token).pipe(
         catchError((err: any) => {
           this.balance.report = err.message;
           return of(undefined);
@@ -46,19 +65,23 @@ export class Index {
       .subscribe((response: IBalance | undefined) => {
         if(response) {
           this.balance.amount = response.balance;
-          this.balance.report = `Balance: ${this.balance.amount} $DAI`;
+          this.balance.report = `Balance: ${this.balance.amount} $${this.tradeOptions.borrow.token}`;
         }
         this.balance.loading = false;
       });
-  }
+  } 
 
   doTrade() {
     this.trade.loading = true;
-    this.trade.report = "Loading...";
-    this.tradeSvc.trade(this.tradeOptions).subscribe((report: ITradeReport) => {
-      debugger
-      this.trade.report = report.message;
+    this.tradeSvc.trade(this.tradeOptions).subscribe((res: ITradeResponse) => {
+
       this.trade.loading = false;
+
+      // save this report
+      this.trades = this.saveSvc.saveTrade(res);
+
+      // now get the stablecoin balance again
+      this.getStableCoinBalance();
     });
   }
 }

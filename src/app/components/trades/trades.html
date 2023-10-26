@@ -1,0 +1,40 @@
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>Options</th>
+            <th>Requested</th>
+            <th>Received</th>
+            <th>Bought</th>
+            <th>Sold</th>
+            <th>Error</th>
+            <th>Env.</th>
+        </tr>
+    </thead>
+    <tbody *ngIf="trades">
+        <tr *ngFor="let trade of trades" [ngClass]="trade.colour">
+            <td>{{ trade.time | date:'hh:mm dd/MM'}}</td>
+            <td>
+                <p>Borrow {{ trade.tradeOptions.borrow.amount }} {{ trade.tradeOptions.borrow.token }} on {{ trade.tradeOptions.borrow.provider }}, buy {{ trade.tradeOptions.buy.token }} on {{ trade.tradeOptions.buy.provider }}, sell on {{ trade.tradeOptions.sell.provider }}</p>
+            </td>
+            <td>
+                <p *ngIf="trade.events.LoanRequested">
+                    {{ trade.loanRequested }}
+                </p>
+            </td>
+            <td>
+                <p *ngIf="trade.events.LoanRequested">
+                    {{ trade.loanReceived }}
+                </p>
+            </td>
+            <td>
+                <p *ngIf="trade.events.TokensBought">
+                    {{ trade.tokensBought }}
+                </p>
+            </td>
+            <td>{{ trade.events.TokensSold }}</td>
+            <td class="error">{{ trade.error }}</td>
+            <td>{{ trade.env.stableCoin}}<br />{{ trade.env.name }}</td>
+        </tr>
+    </tbody>
+</table>

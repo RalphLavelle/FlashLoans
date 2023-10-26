@@ -1,35 +1,41 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.0;
 
+interface IERC20 {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
+}
+
 import { IPoolAddressesProvider } from "./Aave/IPoolAddressesProvider.sol";
-import './UniswapSingleSwap.sol';
-import './OpenZeppelin/IERC20.sol';
+import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import './Aave/FlashLoanSimpleReceiverBase.sol';
 
 contract FlashLoan is FlashLoanSimpleReceiverBase {
     
     address payable owner;
 
-    UniswapSingleSwap uniswap;
+    address public constant buyAddress = 0xE592427A0AEce92De3Edee1F18E0157C05861564; // Uniswap
+    address public constant sellAddress = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506; // Sushiswap
 
-    event LoanRequested(address borrowingToken, uint256 borrowingAmount, address swapToken, uint24 poolFee);
+    // events
+    event LoanRequested(address borrowingToken, uint256 borrowingAmount, address buyingToken, uint24 poolFee);
+    event LoanReceived(uint256 amount, uint256 amountOwed);
+    event TokensBought(uint256 amount, address router);
+    event TokensSold(uint256 amount, address router);
 
     // arbitrage tokens, amount, and fee
-    address borrowingToken;
+    IERC20 public borrowingToken;
     uint256 borrowingAmount;
-    address swapToken;
+    IERC20 public buyingToken;
     uint24 poolFee;
 
     constructor(address _addressProvider)
         FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider))
     {
         owner = payable(msg.sender);
-        uniswap = new UniswapSingleSwap();
-    }
-
-    // this is only to test the Uniswap part 
-    function testingUniswap(address _borrowingToken, uint256 _borrowingAmount, address _swapToken, uint24 _poolFee) external {
-        uniswap.swap(_borrowingToken, _borrowingAmount, _swapToken, _poolFee);
     }
 
     /**
@@ -43,44 +49,80 @@ contract FlashLoan is FlashLoanSimpleReceiverBase {
         bytes calldata params
     ) external override returns (bool) {
 
-        // Buy swapTokens on Uniswap, using borrowingTokens
-        uniswap.swap(borrowingToken, borrowingAmount, swapToken, poolFee);
+        // the loan has been received
+        uint256 amountOwed = amount + premium;
+        emit LoanReceived(amount, amountOwed);
 
-        // Sell swapTokens on SushiSwap, getting borrowingTokens
-        // TODO
+        // Buy tokens
+        uint256 boughtAmount = swap(buyAddress, borrowingToken, buyingToken);
+
+        // Tokens have been bought
+        emit TokensBought(boughtAmount, buyAddress);
+
+        // Sell tokens
+        uint256 soldAmount = swap(sellAddress, buyingToken, borrowingToken);
+
+        // Tokens have been sold
+        emit TokensSold(soldAmount, sellAddress);
+
+        // if we don't have enough to pay back the loan, revert
+        uint256 balance = getBalance(address(borrowingToken));
+        if (balance < amountOwed) {
+            revert("Insufficient balance to repay the loan");
+        }
 
         // Finally, approve the Pool contract allowance to *pull* the owed amount of borrowingToken
-        uint256 amountOwed = amount + premium;
         IERC20(asset).approve(address(POOL), amountOwed);
+
+        return true;
     }
 
-    function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _swapToken, uint24 _poolFee) external {
+    function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _buyingToken, uint24 _poolFee) external onlyOwner {
 
-        borrowingToken = _borrowingToken;
+        borrowingToken = IERC20(_borrowingToken);
         borrowingAmount = _borrowingAmount;
-        swapToken = _swapToken;
+        buyingToken = IERC20(_buyingToken);
         poolFee = _poolFee; 
 
         address receiverAddress = address(this);
-        address asset = borrowingToken;
+        address asset = address(borrowingToken);
         uint256 amount = borrowingAmount;
         bytes memory params = "";
         uint16 referralCode = 0;
 
-        /** uncomment this for staging and prod
-            POOL.flashLoanSimple(
-                receiverAddress,
-                asset,
-                amount,
-                params,
-                referralCode
-            );
-        */
+        POOL.flashLoanSimple(
+            receiverAddress,
+            asset,
+            amount,
+            params,
+            referralCode
+        );
 
-        emit LoanRequested(_borrowingToken, _borrowingAmount, _swapToken, _poolFee);
+        emit LoanRequested(address(borrowingToken), borrowingAmount, address(buyingToken), poolFee);
     }
 
-    function getBalance(address _tokenAddress) external view returns (uint256) {
+    function swap(address routerAddress, IERC20 tokenIn, IERC20 tokenOut) private returns (uint256) {
+
+        ISwapRouter swapRouter = ISwapRouter(routerAddress);
+
+        borrowingToken.approve(address(swapRouter), borrowingAmount);
+
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: address(tokenIn),
+                tokenOut: address(tokenOut),
+                fee: poolFee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: borrowingAmount,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+
+        return swapRouter.exactInputSingle(params);
+    }
+
+    function getBalance(address _tokenAddress) public view returns (uint256) {
         return IERC20(_tokenAddress).balanceOf(address(this));
     }
 

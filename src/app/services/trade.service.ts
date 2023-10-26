@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable, catchError } from "rxjs";
 import { environment } from "../../environments/environment";
-import { IBalance, ITrade, ITradeReport } from "../interfaces";
+import { IBalance, ITradeOptions, ITradeResponse } from "../interfaces";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable()
@@ -15,8 +15,8 @@ export class tradeService {
 	
 	constructor(private http: HttpClient) {}
 	
-	getBalance(): Observable<IBalance> {
-        const url = `${environment.serverEndpoint}/balance`;
+	getBalance(stableCoinSymbol: string): Observable<IBalance> {
+        const url = `${environment.serverEndpoint}/balance?coin=${stableCoinSymbol}`;
         return this.http.get<IBalance>(url).pipe(
             catchError(error => {
                 throw this.embellishError(`getBalance`, error);
@@ -24,9 +24,9 @@ export class tradeService {
         );
 	}
 
-    trade(trade: ITrade): Observable<ITradeReport> {
+    trade(tradeOptions: ITradeOptions): Observable<ITradeResponse> {
         const url = `${environment.serverEndpoint}/trade`;
-        return this.http.post<any>(url, { trade }, this.httpOptions).pipe(
+        return this.http.post<any>(url, { tradeOptions }, this.httpOptions).pipe(
             catchError(error => {
                 throw this.embellishError(`trade`, error);
             })

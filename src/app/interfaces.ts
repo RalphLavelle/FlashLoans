@@ -2,17 +2,40 @@ export interface IBalance {
     balance: number;
 } 
 
-export interface IBorrowing {
-    token: string;
-    amount: number;
+// export interface IBorrowing {
+//     token: string;
+//     amount: number;
+// }
+
+export interface ITradeOptions {
+    borrow: {
+        amount: number;
+        provider: string; // e.g. "Aave"
+        token: string;
+    };
+    buy: {
+        poolFee: number; // e.g. 3000 for 0.3%
+        provider: string; // e.g. "Uniswap"
+        token: string;
+    };
+    sell: {
+        provider: string; // e.g. "Sushiswap"
+    }
 }
 
-export interface ITrade {
-    borrowing: IBorrowing; // e.g. 1000 $DAI
-    poolFee?: number // e.g. 3000 for 0.3%
-    swapToken: string; // e.g. some altcoin, by symbol (e.g. 'ROGAN')
+// returned from the smart contract/back-end
+export interface ITradeResponse {
+    env: {
+        contractAddress: string,
+        name: string
+    },
+    error: string,
+    events: {
+        LoanRequested: any[],
+        LoanReceived: any[],
+        TokensBought: any[],
+        TokensSold: any[]
+    },
+    time?: Date,
+    tradeOptions: ITradeOptions
 }
-
-export interface ITradeReport {
-    message: string;
-} 

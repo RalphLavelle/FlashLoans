@@ -5,7 +5,8 @@ Tradie (FlashLoan trading app)
 1. Start the blockchain
 > cd server
 > npm run hhup  
-> npm run hhdep
+> npm run hhdep  
+
 2. Start the Node app
 > node tradie
 
@@ -19,7 +20,10 @@ Check balance, mint DAI, etc.
 > npx hardhat mintDAI --network localhost
 
 Request a flash loan!
-> npx hardhat requestFlashLoan --network localhost
+> npx hardhat request --network localhost
+
+Test a swap on Mumbai (for example)
+> npx hardhat swap --network mumbai
 
 ## Local env
 Locally, I use a fake ERC20 coin to stand in for $DAI (no $USDC yet). Also, in the local version, the call in FlashLoan to POOL is commented out. 
@@ -39,28 +43,15 @@ Also, I will restrict things initially to two exchanges: Uniswap and SushiSwap. 
 ## Loan providers
 1. Aave
 Docs: https://docs.aave.com/developers/guides/flash-loans, 
-https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
+Addresses:  
+    Testnet: https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
+    Polygon mainnet: https://docs.aave.com/developers/deployed-contracts/v3-mainnet/polygon
 
 Be careful that there are some tokens that may seem to be DAI or LINK, etc., but are in fact an Aave-wrapped version.
 
 ## Dexes
 1. Uniswap
-Since the Uniswap router has the same address for all chains, testnets and main, I'm hardcoding the address into the UniswapSingleSwap contract. SO, one less thing to worry about for testnet/mainnet config.
-
-## Mumbai
-Deploy using Remix.
-Latest FlashLoan address: 0x9D2946eADfa4e5c0CbdaDB044f8704e123142a6B
-
-https://mumbai.polygonscan.com/
-
-JUst stick with one pair of tokens for testing on Mumbai, since it's not guaranteed that a pair that exists on mainnet exists as a pool on testnet. I just need one pair to work, some combination of USDC, DAI, and WETH, probably. 
-
-## Remix imports for Mumbai:
-UniswapSingleSwap:
-import { ISwapRouter} from https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISwapRouter.sol
-
-FlashLoan:
-import {FlashLoanReceiverBase} from "https://github.com/aave/protocol-v2/blob/master/contracts/flashloan/base/FlashLoanReceiverBase.sol";
-import {ILendingPool} from "https://github.com/aave/protocol-v2/blob/master/contracts/interfaces/ILendingPool.sol";
-import {ILendingPoolAddressesProvider} from "https://github.com/aave/protocol-v2/blob/master/contracts/interfaces/ILendingPoolAddressesProvider.sol";
-import {IERC20} from "https://github.com/aave/protocol-v2/blob/master/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
+Since the Uniswap router has the same address for all chains, testnets and main, I'm hardcoding the address into the UniswapSingleSwap contract. So, one less thing to worry about for testnet/mainnet config.
+2. SushiSwap
+3. Balancer
+4. PancakeSwap

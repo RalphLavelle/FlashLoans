@@ -15,7 +15,7 @@
         "exchanges": [
             {
                 "name": "Uniswap",
-                "router": "0x1234...",
+                "router": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
                 "tokens": [
                     {
                         "name": "DAI",
@@ -26,6 +26,24 @@
                         "address": "0x52D800ca262522580CeBAD275395ca6e7598C014"
                     }
                 ]
+            }
+        ],
+        "tokens": [
+            {
+                "name": "GHST",
+                "address": "0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7"
+            },
+            {
+                "name": "DAI",
+                "address": "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded"
+            },
+            {
+                "name": "ROGAN",
+                "address": "0x52D800ca262522580CeBAD275395ca6e7598C014"
+            },
+            {
+                "name": "USDC",
+                "address": "0x52D800ca262522580CeBAD275395ca6e7598C014"
             }
         ]
     },
@@ -50,50 +68,61 @@
         "exchanges": [
             {
                 "name": "Uniswap",
-                "router": "0x1234...",
-                "tokens": [
-                    {
-                        "name": "DAI",
-                        "address": "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded"
-                    },
-                    {
-                        "name": "ROGAN",
-                        "address": "0x52D800ca262522580CeBAD275395ca6e7598C014"
-                    }
-                ]
+                "router": "0xE592427A0AEce92De3Edee1F18E0157C05861564"
             },
             {
                 "name": "Sushiswap",
-                "router": "0x1234...",
-                "tokens": [
-                    {
-                        "name": "DAI",
-                        "address": "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded"
-                    },
-                    {
-                        "name": "USDC",
-                        "address": "0x52D800ca262522580CeBAD275395ca6e7598C014"
-                    }
-                ]
+                "router": "0x1b02da8cb0d097eb8d 57a175b88c7d8b47997506"
+            }
+        ],
+        "tokens": [
+            {
+                "name": "DAI",
+                "address": "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded"
+            },
+            {
+                "name": "GHST",
+                "address": "0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7"
+            },
+            {
+                "name": "USDC",
+                "address": "0xFEca406dA9727A25E71e732F9961F680059eF1F9"
             }
         ]
     },
     "polygon": {
         "lenders": [
             {
-                "name": "Aave"
+                "name": "Aave",
+                "poolAddressesProvider": "0x4CeDCB57Af02293231BAA9D39354D6BFDFD251e0"
             }
         ],
         "exchanges": [
             {
                 "name": "Uniswap",
-                "router": "0x1234...",
-                "pools": []
+                "router": "0xE592427A0AEce92De3Edee1F18E0157C05861564"
             },
             {
                 "name": "Sushiswap",
-                "router": "0x1234...",
-                "pools": []
+                "router": "0x1b02da8cb0d097eb8d 57a175b88c7d8b47997506"
+            }
+        ],
+        "tokens": [
+            {
+                "name": "DAI",
+                "address": "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded"
+            },
+            {
+                "name": "GHST",
+                "address": "0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7"
+            },
+            {
+                "name": "USDC",
+                "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+            },
+            {
+                "name": "USDT",
+                "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
             }
         ]
     }

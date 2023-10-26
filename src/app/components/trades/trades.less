@@ -1,0 +1,37 @@
+@error: #ebb;
+@received: #8a8;
+@bought: #8d8;
+
+table {
+    font-size: 0.85rem;
+    width: 100%;
+    padding: .25rem;
+    border: solid 1px #888;
+    border-radius: .5rem;
+    thead {
+        background-color: #ccc;
+        td {
+            padding: 0.25rem;
+        }
+    }
+    td {
+        overflow: auto;
+        padding: 0.25rem;
+    }   
+    tbody {
+        tr {
+            &.error {
+                background-color: @error;
+            }
+            &.received {
+                background-color: @received;
+            }
+            &.bought {
+                background-color: @bought;
+            }
+            .trade {
+                display: flex;
+            }
+        }
+    }
+}

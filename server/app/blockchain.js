@@ -10,47 +10,35 @@ const Blockchain = {
         return addresses.get(options);
     },
 
-    getProvider() {
-        let provider;
-        const environment = process.env.ENVIRONMENT;
-        const blockchainEndpoint = process.env.BLOCKCHAIN_ENDPOINT;
-        if (environment === "local") {
-            provider = new ethers.providers.JsonRpcProvider(blockchainEndpoint);
-        } else {
-            const network = blockchainEndpoint;
-            const apiKey = process.env.InfuraAPIKey;
-            console.log(`Connecting to ${network} with ${apiKey}.`);
-            provider = new ethers.providers.InfuraProvider(network, apiKey);
-        }
-        return provider;
-    },
-
-    getSigner(provider) {
-        const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-        return signer;
-    },
-
-    getDaiContract() {
+    getStableCoinContract() {
         const abi = [
-            "function balanceOf(address account) public view returns (uint256)",
+            "function balanceOf(address account) external view returns (uint256)",
             "function mint(address to, uint256 amount)"
         ];
-        return new ethers.Contract(process.env.DAI, abi);
+        return this.getContract({
+            address: process.env.STABLECOIN, abi
+        });
     },
 
     getFlashLoanContract() {
-        const abi = [
-            "event LoanRequested(address borrowingToken, uint256 borrowingAmount, address swapToken, uint24 poolFee)",
-            "function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _swapToken, uint24 _poolFee) public"
+        let abi = [
+            "function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _buyingToken, uint24 _poolFee) public onlyOwner",
+            "function swap(address routerAddress) private returns (uint256 amountOut)",
+            "function getBalance(address _tokenAddress) external view returns (uint256)",
+            "function withdraw(address _tokenAddress) external onlyOwner"
         ];
-        return new ethers.Contract(process.env.FLASHLOAN, abi);
-    },
-
-    getUniswapSingleSwapContract() {
-        const abi = [
-            "event TokenSwapped(address borrowingToken, uint256 borrowingAmount, address swapToken, uint24 poolFee)"
+        const eventSigs = [
+            "LoanRequested(address borrowingToken, uint256 borrowingAmount, address buyingToken, uint24 poolFee)",
+            "LoanReceived(uint256 amount, uint256 amountOwed)",
+            "TokensBought(uint256 amount, address router)",
+            "TokensSold(uint256 amount, address router)"
         ];
-        return new ethers.Contract(process.env.UNISWAP_SINGLESWAP, abi)
+        abi = abi.concat(eventSigs.map(es => `event ${es}`));
+        const events = this.makeEvents(eventSigs);
+        
+        return this.getContract({
+            address: process.env.FLASHLOAN, abi, events
+        });
     },
 
     getContract(options) {
@@ -58,8 +46,59 @@ const Blockchain = {
         const signer = this.getSigner(provider);
         // console.log(`Connecting to the FlashLoan contract at ${process.env.FLASHLOAN}\n`);
         let contract = new ethers.Contract(options.address, options.abi, signer);
-        return contract;
+        let events = options.events ? options.events : [];
+        return {
+            address: options.address,
+            contract,
+            events
+        };
+    },
+
+    getProvider() {
+        const blockchainEndpoint = process.env.BLOCKCHAIN_ENDPOINT;
+        return new ethers.providers.JsonRpcProvider(blockchainEndpoint);
+    },
+
+    getSigner(provider) {
+        const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+        return signer;
+    },
+
+    makeEvents(sigs) {
+        let events = [];
+        sigs.forEach(s => {
+            let sParts = s.split("(");
+            const name = sParts[0];
+            const args = sParts[1].split(")")[0].split(",").map(a => {
+                let aParts = a.trim().split(" ");
+                return {
+                    name: aParts[1],
+                    type: aParts[0]
+                }
+            });
+            let event = { name, args };
+            events.push(event);
+        });
+        return events;
+    },
+
+    getEventArgs(event, flashloan, txReceipt) {
+        const filter = event();
+        let args = txReceipt.logs
+            .filter(l => l.address === flashloan.contract.address && filter.topics[0] === l.topics[0])
+            .map(l => flashloan.contract.interface.parseLog(l))
+            .map(e => e.args);
+        if(args) return args[0];
+        return undefined;
+    },
+
+    prettifyError(fullError) {
+        const gasLimit = "UNPREDICTABLE_GAS_LIMIT".toLowerCase();
+        if(fullError.toLowerCase().indexOf(gasLimit) > -1) {
+            return gasLimit.toUpperCase();
+        }
+        return fullError;
     }
 };
 
-module.exports = Blockchain;
+module.exports = Blockchain; 

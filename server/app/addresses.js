@@ -9,8 +9,16 @@ class Addresses {
     constructor() {
         const path = './data/data.json';
         this.data = fs.readFileSync(path, 'utf8');
+        this.network = this.getNetwork(process.env.ENVIRONMENT);
+    }
 
-        this.network = process.env.ENVIRONMENT === "local" ? "localhost" : "mumbai";
+    getNetwork(env) {
+        const dict = {
+            local: "localhost",
+            staging: "mumbai",
+            prod: "polygon"
+        };
+        return dict[env];
     }
 
     get(options) {
@@ -26,8 +34,8 @@ class Addresses {
                 token = getName(lender.tokens);
                 
             } else {
-                const dex = network['exchanges'].find(n => n.name.toLowerCase() === options.dex.toLowerCase());
-                token = getName(dex.tokens);
+                const tokens = network['tokens'];
+                token = getName(tokens);
             }
             return token.address;
         } catch (ex) {
