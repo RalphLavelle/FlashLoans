@@ -9,28 +9,34 @@ async function main() {
   }
   
   // first, deploy the pool addresses provider
-  let poolAddressesProviderAddress = process.env.AAVE_LENDING_POOL;
-  if(environment == "local") {
-    const Mock = await hre.ethers.getContractFactory("MockPoolAddressesProvider");
-    const m = await Mock.deploy();
-    await m.deployed();
-    poolAddressesProviderAddress = m.address;
-    reportDeployed("MockPoolAddressesProvider", m);
-  } else {
-    console.log(`Using the PoolAddressesProvider contract at ${poolAddressesProviderAddress}.`);
-  }
+  // let poolAddressesProviderAddress = process.env.AAVE_LENDING_POOL;
+  // if(environment == "local") {
+  //   const Mock = await hre.ethers.getContractFactory("MockPoolAddressesProvider");
+  //   const m = await Mock.deploy();
+  //   await m.deployed();
+  //   poolAddressesProviderAddress = m.address;
+  //   reportDeployed("MockPoolAddressesProvider", m);
+  // } else {
+  //   console.log(`Using the PoolAddressesProvider contract at ${poolAddressesProviderAddress}.`);
+  // }
+
+  // Deploy the Swap contract
+  const swap = await ethers.getContractFactory("Swap");
+  const Swap = await swap.deploy();
+  await Swap.deployed();
+  reportDeployed("SWAP", Swap);
 
   // Next, deploy the DAI
-  const dai = await ethers.getContractFactory("DAI");
-  const DAI = await dai.deploy();
-  await DAI.deployed();
-  reportDeployed("$DAI", DAI);
+  // const dai = await ethers.getContractFactory("DAI");
+  // const DAI = await dai.deploy();
+  // await DAI.deployed();
+  // reportDeployed("$DAI", DAI);
 
-  const FlashLoan = await hre.ethers.getContractFactory("FlashLoan");
-  const flashLoan = await FlashLoan.deploy(poolAddressesProviderAddress);
-  await flashLoan.deployed();
-  reportDeployed("FlashLoan", flashLoan);
-  console.log(`Owner: ${owner.address}`);
+  // const FlashLoan = await hre.ethers.getContractFactory("FlashLoan");
+  // const flashLoan = await FlashLoan.deploy(poolAddressesProviderAddress);
+  // await flashLoan.deployed();
+  // reportDeployed("FlashLoan", flashLoan);
+  // console.log(`Owner: ${owner.address}`);
 }
 
 main().catch((error) => {

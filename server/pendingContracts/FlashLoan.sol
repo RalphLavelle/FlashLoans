@@ -10,7 +10,7 @@ interface IERC20 {
 }
 
 import { IPoolAddressesProvider } from "./Aave/IPoolAddressesProvider.sol";
-import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
+import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
 import './Aave/FlashLoanSimpleReceiverBase.sol';
 
 contract FlashLoan is FlashLoanSimpleReceiverBase {
