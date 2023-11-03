@@ -1,11 +1,22 @@
+import { Token } from '@uniswap/sdk-core'
+
 export interface IBalance {
     balance: number;
-} 
+}
 
-// export interface IBorrowing {
-//     token: string;
-//     amount: number;
-// }
+export interface IQuoteConfig {
+    rpc: {
+        local: string
+        mainnet: string
+        testnet: string
+    }
+    tokens: {
+        in: Token
+        amountIn: number
+        out: Token
+        poolFee: number
+    }
+}
 
 export interface ITradeOptions {
     borrow: {

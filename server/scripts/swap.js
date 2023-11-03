@@ -4,8 +4,8 @@ require("dotenv").config();
 task("swap", "Test script to swap coins on Uniswap, and other dexes").setAction(async () => {
     const SwapAddress = process.env.SWAP;
 
-	const tokenIn = "0xFEca406dA9727A25E71e732F9961F680059eF1F9"; // USDC
-	const tokenOut = "0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7" // GHST
+	const tokenIn = "0x52D800ca262522580CeBAD275395ca6e7598C014"; // USDC
+	const tokenOut = "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded" // DAI
 
     const reportBalance = async () => {
         balTokenIn = await swap.getBalance(tokenIn);
@@ -22,7 +22,7 @@ task("swap", "Test script to swap coins on Uniswap, and other dexes").setAction(
 	const amount = 1;
     const convertedAmount = ethers.BigNumber.from(10).pow(6).mul(amount);
 
-    await swap.trade(tokenIn, convertedAmount, tokenOut);
+    // await swap.trade(tokenIn, convertedAmount, tokenOut);
 
     await reportBalance();
 

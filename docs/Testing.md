@@ -23,7 +23,13 @@ Borrowing 1 USDC to swap GHST
 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174, 1000000, 0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7, 3000
 
 ## Swap contract
-The actual swap (Uniswap & Sushi) is causing problems without letting me know exactly what's happening.
+The actual swap (Uniswap & Sushi) is causing problems without letting me know exactly what's happening. Steps to work with the contract:
 
-0xFEca406dA9727A25E71e732F9961F680059eF1F9, 100000000, 0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7 - USDV to GHST
-0xeaBc4b91d9375796AA4F69cC764A4aB509080A58, 1000000, 0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded
+1. Deploy in Remix
+2. Check balance in USDC - should be 0. Check DAI: also 0.
+3. Using Metamask, send 8 USDC to the contract.
+4. Check USDC balance - should say 8000000.
+4. Swap USDC for DAI...
+
+USDC to DAI
+0x52D800ca262522580CeBAD275395ca6e7598C014, 0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded, 2000000000000000000
