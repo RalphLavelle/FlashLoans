@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7;
+pragma solidity >=0.5.0;
 
 import 'https://github.com/Uniswap/v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router02.sol';
 import 'https://github.com/Uniswap/v2-core/blob/master/contracts/interfaces/IERC20.sol';
@@ -27,8 +27,9 @@ contract Swap {
         owner = payable(msg.sender);
     }
 
-    function trade(address _tokenIn, address _tokenOut, uint256 _amountIn) external {
-        IERC20(_tokenIn).approve(routerAddress, _amountIn);
+    function trade(address _tokenIn, address _tokenOut, uint256 _amount) external {
+        // approve them for the router
+        IERC20(_tokenIn).approve(routerAddress, _amount);
         // Buy tokens
         swap(_tokenIn, _tokenOut, _amount, routerAddress);
         // Tokens have been bought
