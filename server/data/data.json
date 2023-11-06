@@ -117,6 +117,10 @@
                 "address": "0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7"
             },
             {
+                "name": "MATIC",
+                "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+            },
+            {
                 "name": "USDC",
                 "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
             },
