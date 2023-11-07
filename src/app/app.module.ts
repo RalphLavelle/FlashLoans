@@ -7,9 +7,11 @@ import { Index } from './components/index/app.index';
 import { tradeService } from './services/trade.service';
 import { saveService } from './services/save.service';
 import { Trades } from './components/trades/trades';
+import { Admin } from './components/admin/admin';
 
 @NgModule({
   declarations: [
+    Admin,
     Index,
     Trades
   ],

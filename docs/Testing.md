@@ -20,7 +20,7 @@ Deploy using Remix.
 Aave Pool Address Provider (APP): 0x4CeDCB57Af02293231BAA9D39354D6BFDFD251e0
 
 ## Swap contract
-The actual swap (Uniswap & Sushi) is causing problems without letting me know exactly what's happening.
+The actual swap (Uniswap & Sushi) is causing problems without letting me know exactly what's happening. Steps to work with the contract:
 
 Swapping $USDC for $DAI
 0x52D800ca262522580CeBAD275395ca6e7598C014, 3000000, 0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded
@@ -33,3 +33,14 @@ Swapping $USDT for $USDC
 0xf79C5a54b186479cD1276C5Ac7919825a9B8562c
 0x78876C995BD347c880A33AAcF8975a10a53A30D7
 0xc00afbf597197b25d0170991486d9551f6bcf009
+1. Deploy in Remix
+2. Check balance in USDC - should be 0. Check DAI: also 0.
+3. Using Metamask, send 8 USDC to the contract.
+4. Check USDC balance - should say 8000000.
+4. Swap USDC for DAI...
+
+USDC to DAI
+0x52D800ca262522580CeBAD275395ca6e7598C014, 0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded, 2000000000000000000
+
+Latest on Polygon
+0x37e471c6bbb0c31D7b62B40Ad2643DeFF9a71F66

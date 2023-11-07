@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.0;
+pragma abicoder v2;
 
 interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -9,14 +10,20 @@ interface IERC20 {
     function approve(address spender, uint256 amount) external returns (bool);
 }
 
-import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
+// import { ISwapRouter } from 'https://github.com/Uniswap/v3-periphery/blob/master/contracts/interfaces/ISwapRouter.sol';
+// import { IUniswapV2Router02 } from 'https://github.com/Uniswap/v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router02.sol';
+import { ISwapRouter } from '@uniswap/v3-periphery/blob/master/contracts/interfaces/ISwapRouter.sol';
+import { IUniswapV2Router02 } from '@uniswap/v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router02.sol';
 
 contract Swap {
     
     address payable owner;
 
-    address public constant buyAddress = 0xE592427A0AEce92De3Edee1F18E0157C05861564; // Uniswap
-    // address public constant sellAddress = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506; // Sushiswap
+    address public constant uniswapRouterAddress = 0xE592427A0AEce92De3Edee1F18E0157C05861564; // Uniswap
+    ISwapRouter public immutable uniswapRouter = ISwapRouter(uniswapRouterAddress);
+    address public constant sushiswapRouterAddress = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506; // Sushiswap
+    IUniswapV2Router02 public immutable sushiswapRouter = IUniswapV2Router02(sushiswapRouterAddress);
+    
 
     // events
     event TokensBought(uint256 amount, address router);
@@ -32,6 +39,8 @@ contract Swap {
         owner = payable(msg.sender);
     }
 
+    receive() external payable {}
+
     /**
         This function is called after your contract has received the flash loaned amount
      */
@@ -41,28 +50,45 @@ contract Swap {
         tokenOut = IERC20(_tokenOut);
 
         // Buy tokens
-        uint256 boughtAmount = swap(buyAddress);
+        uint256 boughtAmount = swapV3(uniswapRouter, tokenIn, tokenOut);
 
         // Tokens have been bought
-        emit TokensBought(boughtAmount, buyAddress);
+        emit TokensBought(boughtAmount, address(uniswapRouter));
 
         // Sell tokens
-        //uint256 soldAmount = swap(sellAddress, buyingToken, borrowingToken);
+        // uint256 soldAmount = swapV2(sushiswapRouter, tokenOut, tokenIn);
 
         // Tokens have been sold
-       // emit TokensSold(soldAmount, sellAddress);
+        // emit TokensSold(soldAmount, address(sushiswapRouter));
     }
 
-    function swap(address routerAddress) private returns (uint256) {
+    function swapV2(IUniswapV2Router02 _router, IERC20 _token0, IERC20 _token1) private returns (uint256) {
+        
+        tokenOut.approve(address(_router), amount);
 
-        ISwapRouter swapRouter = ISwapRouter(routerAddress);
+        // Define the path for the swap
+        address[] memory path = new address[](2);
+        path[0] = address(_token0);
+        path[1] = address(_token1);
+        uint256[] memory amountsOut = _router.swapExactTokensForTokens(
+            amount,
+            1000,
+            path,
+            address(this),
+            block.timestamp + 3600
+        );
+        return amountsOut[0];
+    }
 
-        tokenIn.approve(address(swapRouter), amount);
+    function swapV3(ISwapRouter _router, IERC20 _token0, IERC20 _token1) private returns (uint256) {
+
+        // uint256 maxAllowance = type(uint256).max;
+        _token0.approve(address(_router), amount);
 
         ISwapRouter.ExactInputSingleParams memory params =
             ISwapRouter.ExactInputSingleParams({
-                tokenIn: address(tokenIn),
-                tokenOut: address(tokenOut),
+                tokenIn: address(_token0),
+                tokenOut: address(_token1),
                 fee: poolFee,
                 recipient: address(this),
                 deadline: block.timestamp,
@@ -71,12 +97,10 @@ contract Swap {
                 sqrtPriceLimitX96: 0
             });
 
-        return swapRouter.exactInputSingle(params);
+        return _router.exactInputSingle(params);
     }
 
 	function getBalance(address _tokenAddress) external view returns (uint256) {
         return IERC20(_tokenAddress).balanceOf(address(this));
     }
-
-    receive() external payable {}
 }
