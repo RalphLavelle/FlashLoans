@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity 0.8.0;
 
-import {IFlashLoanSimpleReceiver} from './IFlashLoanSimpleReceiver.sol';
-import {IPoolAddressesProvider} from './IPoolAddressesProvider.sol';
-import {IPool} from './IPool.sol';
+import { IFlashLoanSimpleReceiver } from './IFlashLoanSimpleReceiver.sol';
+import { IPoolAddressesProvider } from './IPoolAddressesProvider.sol';
+import { IPool } from './IPool.sol';
 
 /**
  * @title FlashLoanSimpleReceiverBase

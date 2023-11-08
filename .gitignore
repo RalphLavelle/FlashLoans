@@ -13,3 +13,6 @@ artifacts
 .env.local
 .env.staging
 .env.prod
+
+server/pendingContracts
+server/_testContracts

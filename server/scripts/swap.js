@@ -2,29 +2,42 @@ require("@nomiclabs/hardhat-ethers");
 require("dotenv").config();
 
 task("swap", "Test script to swap coins on Uniswap, and other dexes").setAction(async () => {
-    const SwapAddress = process.env.SWAP;
+    
+    // tokens
+	const tokenIn = {
+        name: "USDC",
+        address: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+        balance: 0
+    };
+	const tokenOut = {
+        name: "USDT",
+        address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+        balance: 0
+    };
 
-	const tokenIn = "0x52D800ca262522580CeBAD275395ca6e7598C014"; // USDC
-	const tokenOut = "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded" // DAI
-
-    const reportBalance = async () => {
-        balTokenIn = await swap.getBalance(tokenIn);
-		balTokenOut = await swap.getBalance(tokenOut);
-		const format = bal => ethers.utils.formatEther(bal)
-        console.log(`>>> Balance of tokenIn: ${format(balTokenIn)}, tokenOut: ${format(balTokenOut)}.\n`);
+    const getContract = async () => {
+        let swapFactory = undefined;
+        swapFactory = await ethers.getContractFactory("Swap");
+        const contract = await swapFactory.attach(SwapAddress);
+        return contract;
     }
 
-    const swapFactory = await ethers.getContractFactory("Swap");
-    const swap = await swapFactory.attach(SwapAddress);
+    const reportBalance = async () => {
+        tokenIn.balance = await swap.getBalance(tokenIn.address);
+		tokenOut.balance = await swap.getBalance(tokenOut.address);
+        console.log(`>>> Balance of ${tokenIn.name}: ${tokenIn.balance}, ${tokenOut.name}: ${tokenOut.balance}.\n`);
+    }
+
+    const SwapAddress = process.env.SWAP;
+    
+    let swap = await getContract();
 
     await reportBalance();
 
-	const amount = 1;
-    const convertedAmount = ethers.BigNumber.from(10).pow(6).mul(amount);
-
-    // await swap.trade(tokenIn, convertedAmount, tokenOut);
-
+    await swap.trade(tokenIn.address, Math.ceil(tokenIn.balance/2), tokenOut.address);
+    
+    swap = await getContract();
+	
     await reportBalance();
-
 });
 module.exports = {};

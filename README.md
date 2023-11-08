@@ -22,9 +22,6 @@ Check balance, mint DAI, etc.
 Request a flash loan!
 > npx hardhat request --network localhost
 
-Use the Uniswap SDK
-> node scripts/uniswap
-
 Test a swap on Mumbai (for example)
 > npx hardhat swap --network mumbai
 
