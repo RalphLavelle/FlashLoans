@@ -22,9 +22,9 @@ const Blockchain = {
 
     getFlashLoanContract() {
         let abi = [
-            "function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _buyingToken, uint24 _poolFee) public onlyOwner",
-            "function swap(address routerAddress) private returns (uint256 amountOut)",
-            "function getBalance(address _tokenAddress) external view returns (uint256)",
+            "modifier onlyOwner()",
+            "function requestFlashLoan(address _borrowingToken, uint256 _borrowingAmount, address _buyingToken, uint24 _poolFee) external onlyOwner",
+            "function getBalance(address _tokenAddress) public view returns (uint256)",
             "function withdraw(address _tokenAddress) external onlyOwner"
         ];
         const eventSigs = [

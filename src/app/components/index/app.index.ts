@@ -4,7 +4,6 @@ import { saveService } from '../../services/save.service';
 import { catchError, of } from 'rxjs';
 import { IBalance, ITradeOptions, ITradeResponse } from "./../../interfaces";
 
-
 @Component({
   selector: 'trading-bot',
   templateUrl: './app.index.html',
@@ -12,22 +11,17 @@ import { IBalance, ITradeOptions, ITradeResponse } from "./../../interfaces";
 })
 export class Index {
 
-  tradeOptions: ITradeOptions = {
-    borrow: {
-      amount: 100,
-      provider: "Aave",
-      token: 'USDT'
+  tradeOptions: any = {
+    tokenIn: {
+      symbol: "USDC",
+      address: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+      amount: 1000000
     },
-    buy: {
-      poolFee: 3000,
-      provider: "Uniswap",
-      token: 'GHST'
-    },
-    sell: {
-      provider: "Sushiswap"
-    }
-  };
-  
+    tokenOut: {
+      symbol: "CHAIN",
+      address: "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39"
+  }}
+
   balance: {
     amount?: number,
     loading: boolean,

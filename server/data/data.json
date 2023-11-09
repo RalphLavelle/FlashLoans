@@ -98,7 +98,7 @@
         "lenders": [
             {
                 "name": "Aave",
-                "poolAddressesProvider": "0x4CeDCB57Af02293231BAA9D39354D6BFDFD251e0"
+                "poolAddressesProvider": "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
             }
         ],
         "exchanges": [
@@ -112,6 +112,10 @@
             }
         ],
         "tokens": [
+            {
+                "name": "LINK",
+                "address": "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39"
+            },
             {
                 "name": "DAI",
                 "address": "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded"

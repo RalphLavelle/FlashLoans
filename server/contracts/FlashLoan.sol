@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.0;
+pragma solidity 0.8.10;
 pragma abicoder v2;
-
-//import { FlashLoanSimpleReceiverBase } from "https://github.com/aave/aave-v3-core/blob/master/contracts/flashloan/interfaces/IPoolAddressesProvider.sol";
-//import { IERC20 } from "...";
-//import { IPoolAddressesProvider } from "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPoolAddressesProvider.sol";
-//import { ISwapRouter } from 'https://github.com/Uniswap/v3-periphery/blob/master/contracts/interfaces/ISwapRouter.sol';
-//import { IUniswapV2Router02 } from 'https://github.com/Uniswap/v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router02.sol';
 
 import { FlashLoanSimpleReceiverBase } from "./Aave/FlashLoanSimpleReceiverBase.sol";
 import { IERC20 } from './IERC20.sol';
@@ -24,7 +18,7 @@ contract FlashLoan is FlashLoanSimpleReceiverBase {
     IUniswapV2Router02 public immutable sushiswapRouter = IUniswapV2Router02(sushiswapRouterAddress);
 
     // events
-    event LoanRequested(address borrowingToken, uint256 borrowingAmount, address buyingToken, uint24 poolFee);
+    event LoanRequested(address borrowingToken, uint256 amount, address buyingToken, uint24 poolFee);
     event LoanReceived(uint256 amount, uint256 amountOwed);
     event TokensBought(uint256 amount, address router);
     event TokensSold(uint256 amount, address router);
@@ -81,19 +75,19 @@ contract FlashLoan is FlashLoanSimpleReceiverBase {
 
         // the loan has been received
         uint256 amountOwed = amount + premium;
-        emit LoanReceived(amount, amountOwed);
+        // emit LoanReceived(amount, amountOwed);
 
-        // Buy tokens
-        uint256 boughtAmount = swapV3(uniswapRouter, tokenIn, tokenOut, amount);
+        // // Buy tokens
+        // uint256 boughtAmount = swapV3(uniswapRouter, tokenIn, tokenOut, amount);
 
-        // Tokens have been bought
-        emit TokensBought(boughtAmount, address(uniswapRouter));
+        // // Tokens have been bought
+        // emit TokensBought(boughtAmount, address(uniswapRouter));
 
-        // Sell tokens
-        uint256 soldAmount = swapV2(sushiswapRouter, tokenOut, tokenIn, boughtAmount);
+        // // Sell tokens
+        // uint256 soldAmount = swapV2(sushiswapRouter, tokenOut, tokenIn, boughtAmount);
 
-        // Tokens have been sold
-        emit TokensSold(soldAmount, address(sushiswapRouter));
+        // // Tokens have been sold
+        // emit TokensSold(soldAmount, address(sushiswapRouter));
 
         // if we don't have enough to pay back the loan, revert
         uint256 balance = getBalance(address(tokenIn));

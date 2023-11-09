@@ -21,17 +21,12 @@ export interface IQuoteConfig {
 export interface ITradeOptions {
     borrow: {
         amount: number;
-        provider: string; // e.g. "Aave"
         token: string;
     };
     buy: {
         poolFee: number; // e.g. 3000 for 0.3%
-        provider: string; // e.g. "Uniswap"
         token: string;
     };
-    sell: {
-        provider: string; // e.g. "Sushiswap"
-    }
 }
 
 // returned from the smart contract/back-end

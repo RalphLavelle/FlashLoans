@@ -22,21 +22,14 @@ class Addresses {
     }
 
     get(options) {
-        // symbol is 'DAI', 'USDC', 'LINK', etc
-        // lender means it's the borrowingToken
-        // dex means it's a swapToken
         try {
             const network = JSON.parse(this.data)[this.network];
-            const getName = tokens => tokens.find(n => n.name.toLowerCase() === options.symbol.toLowerCase());
+            const getName = tokens => tokens.find(n => {
+                return n.name.toLowerCase() === options.toLowerCase();
+            });
             let token;
-            if(options.lender) {
-                const lender = network['lenders'].find(n => n.name.toLowerCase() === options.lender.toLowerCase());
-                token = getName(lender.tokens);
-                
-            } else {
-                const tokens = network['tokens'];
-                token = getName(tokens);
-            }
+            const tokens = network['tokens'];
+            token = getName(tokens);
             return token.address;
         } catch (ex) {
             console.log(`Adresses.get() error: ${ex.message}`);

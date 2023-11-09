@@ -24,7 +24,7 @@ export class tradeService {
         );
 	}
 
-    trade(tradeOptions: ITradeOptions): Observable<ITradeResponse> {
+    trade(tradeOptions: any): Observable<ITradeResponse> {
         const url = `${environment.serverEndpoint}/trade`;
         return this.http.post<any>(url, { tradeOptions }, this.httpOptions).pipe(
             catchError(error => {

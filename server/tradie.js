@@ -46,23 +46,23 @@ app.post('/trade', async (req, res) => {
         response.error = "";
 
         // borrowing
-        const borrowTokenAddress = Blockchain.getAddress({
-            symbol: tradeOptions.borrow.token
+        const tokenInAddress = Blockchain.getAddress({
+            symbol: tradeOptions.tokenIn.symbol
         });
-        if(!borrowTokenAddress) response.error += `Invalid borrow token: ${tradeOptions.borrow.token} `;
+        if(!tokenInAddress) response.error += `Invalid tokenIn: ${tradeOptions.tokenIn.symbol} `;
         
         // swapping
-        const buyTokenAddress = Blockchain.getAddress({
-            symbol: tradeOptions.buy.token
+        const tokenOutAddress = Blockchain.getAddress({
+            symbol: tradeOptions.tokenOut.symbol
         });
-        if(!buyTokenAddress) response.error += `Invalid buy token: ${tradeOptions.buy.token}`;
+        if(!tokenOutAddress) response.error += `Invalid tokenOut: ${tradeOptions.tokenOut.symbol}`;
 
         if(!response.error) {
             const txResponse = await flashLoan.contract.requestFlashLoan(
-                borrowTokenAddress,
-                tradeOptions.borrow.amount,
-                buyTokenAddress,
-                tradeOptions.buy.poolFee
+                tokenInAddress,
+                tradeIn.amount,
+                tokenOut.address,
+                3000
             );
             const txReceipt = await txResponse.wait();
             const filters = flashLoan.contract.filters;

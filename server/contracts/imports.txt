@@ -1,0 +1,5 @@
+import { FlashLoanSimpleReceiverBase } from "https://github.com/RalphLavelle/FlashLoans/blob/main/server/contracts/Aave/FlashLoanSimpleReceiverBase.sol";
+import { IERC20 } from "https://github.com/RalphLavelle/FlashLoans/blob/main/server/contracts/IERC20.sol";
+import { IPoolAddressesProvider } from "https://github.com/RalphLavelle/FlashLoans/blob/main/server/contracts/Aave/IPoolAddressesProvider.sol";
+import { ISwapRouter } from 'https://github.com/Uniswap/v3-periphery/blob/master/contracts/interfaces/ISwapRouter.sol';
+import { IUniswapV2Router02 } from 'https://github.com/Uniswap/v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router02.sol';
